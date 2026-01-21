@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: lab4-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: lab4
+    ports:
+      - "5432:5432"
+    volumes:
+      - wildfly_data:/var/lib/postgresql/data
+    restart: always
+    shm_size: 128mb
+    networks:
+      - lab4-app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d lab4" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  wildfly:
+    image: artem5252/lab4-backend:latest
+    container_name: lab4-wildfly
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lab4-app-network
+
+  frontend:
+    image: artem5252/lab4-svelte:latest
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      wildfly:
+        condition: service_started
+    networks:
+      - lab4-app-network
+
+
+networks:
+  lab4-app-network:
+
+volumes:
+  wildfly_data:
