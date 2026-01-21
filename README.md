@@ -31,7 +31,7 @@ git clone https://github.com/artem961/web-lab4
 ```
 ### Шаг 2: Перейдите в репозиторий
 ```bash
-сd web-lab4
+cd web-lab4
 ```
 ### Шаг3: Запустите готовый docker-compose файл
 ```bash
